@@ -225,6 +225,15 @@ function App() {
       setAuthLoading(false);
     }
   };
+  const handleLogout = () => {
+    localStorage.removeItem("resumehub_token");
+    localStorage.removeItem("resumehub_user");
+
+    setIsAuthenticated(false);
+    setActivePage("dashboard");
+
+    showMessage("You have been logged out.", "info");
+  };
 
   // =========================================================
   // FILE CHANGE
@@ -279,8 +288,8 @@ function App() {
   // =========================================================
   // UPLOAD RESUME
   // =========================================================
-
   const handleUpload = async () => {
+
     if (!file) {
       showMessage("Please select a PDF resume first.", "error");
       return;
@@ -290,12 +299,20 @@ function App() {
     formData.append("file", file);
 
     try {
+
       setUploading(true);
       showMessage("Uploading your resume...", "info");
 
+      const token = localStorage.getItem("resumehub_token");
+
       const response = await axios.post(
         `${BACKEND}/api/resumes/upload`,
-        formData
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setResumeId(response.data.id);
@@ -304,18 +321,22 @@ function App() {
         `Resume uploaded successfully! Resume ID: ${response.data.id}`,
         "success"
       );
+
     } catch (error) {
+
       console.error("Upload error:", error);
 
       showMessage(
         "Upload failed: " + getErrorMessage(error),
         "error"
       );
+
     } finally {
+
       setUploading(false);
+
     }
   };
-
   // =========================================================
   // JOB SEARCH
   // =========================================================
@@ -2126,31 +2147,28 @@ function App() {
           </div>
 
           <div className="sidebar-user">
-
             <div className="small-avatar">
-              {profile.name
-                .charAt(0)
-                .toUpperCase()}
+              {profile.name.charAt(0).toUpperCase()}
             </div>
-            <button
-              className="logout-button"
-              onClick={handleLogout}
-            >
-              <span>↪</span>
-              Logout
-            </button>
 
             <div>
-              <strong>
-                {profile.name}
-              </strong>
-
-              <span>
-                {profile.role}
-              </span>
+              <strong>{profile.name}</strong>
+              <span>{profile.role}</span>
             </div>
-
           </div>
+
+          <button
+            className="logout-button"
+            onClick={() => {
+              console.log("LOGOUT CLICKED");
+              handleLogout();
+            }}
+          >
+            <span>↪</span>
+            Logout
+          </button>
+
+          
 
         </div>
 
