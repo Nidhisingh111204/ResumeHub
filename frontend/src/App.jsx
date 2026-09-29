@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-const BACKEND = "http://localhost:8080";
+const BACKEND = "https://resumehub-api-server.onrender.com";
 
 function getErrorMessage(error) {
   const data = error.response?.data;
